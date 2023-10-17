@@ -1,0 +1,63 @@
+from tkinter import *
+import tkinter as tk
+import vlc
+import time
+
+ventana = Tk()
+ventana.title("Entrada")
+ventana.tk.call('wm', 'geometry', ventana._w, "400x300+100+100")
+
+IP = str()
+Subred = str()
+Puerta_de_enlace = str()
+
+etiqueta1 =  Label(ventana, text="IP address")
+etiqueta1.config(width=200, height=20)
+entrada1= Entry(textvariable= IP)
+entrada1.place(x=170, y=10)
+
+etiqueta2 =  Label(ventana, text="Usuario")
+etiqueta2.config(width=200, height=20)
+entrada2= Entry(textvariable= Subred)
+entrada2.place(x=170, y=40)
+
+etiqueta3 =  Label(ventana, text="Contraseña")
+etiqueta3.config(width=200, height=20)
+entrada3= Entry(textvariable= Puerta_de_enlace)
+entrada3.place(x=170, y=80)
+
+rtsp_url = f"rtsp://{etiqueta2}:{etiqueta3}@{etiqueta1}:554/onvif1"
+
+instance = vlc.Instance("--no-xlib")
+
+# Crear un reproductor VLC
+player = instance.media_player_new()
+media = instance.media_new(rtsp_url)
+media.get_mrl()
+player.set_media(media)
+
+
+win_id = player.get_hwnd()
+if win_id:
+    player.set_hwnd(win_id)
+
+# Configurar la ventana Tkinter
+frame = tk.Frame(ventana)
+frame.pack(fill="both", expand=True)
+
+# Iniciar la reproducción
+while rtsp_url == True:
+    player.play()
+
+    if not player:
+        break
+    
+
+# Función para cerrar la ventana
+def on_closing():
+    player.stop()
+    ventana.destroy()
+
+ventana.protocol("WM_DELETE_WINDOW", on_closing)
+
+ventana.mainloop()
